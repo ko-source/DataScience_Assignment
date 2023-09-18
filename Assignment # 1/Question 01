@@ -1,0 +1,55 @@
+# 17 September 2023
+# CSC461 – Assignment1 – Web Scraping
+# Komal Khizar
+# FA20-BSE-096
+# Q1. [CLO-2]
+#I have selected 5 favorite movies and get their links from the website.Then i have stored that links in a list and then by a loop acess one by one link
+# and scrap thier title and rating these title and rating stores in the lists name titles and ratings rspectively. then i make a daframe and 
+# print this information in a  movie_ratings.xlsx. 
+
+import requests
+from bs4 import BeautifulSoup
+import time
+import pandas as pd
+
+# URLs of my 5 favorite movies
+movie_urls = [
+    'https://www.imdb.com/title/tt1375666/?ref_=nv_sr_srsg_0_tt_8_nm_0_q_incep',
+    'https://www.imdb.com/title/tt11720440/?ref_=nv_sr_srsg_0_tt_4_nm_0_q_carry%2520on%2520jutta',
+    'https://www.imdb.com/title/tt6750852/?ref_=nv_sr_srsg_0_tt_3_nm_0_q_rab%2520da%2520radio',
+    'https://www.imdb.com/title/tt4846952/?ref_=nv_sr_srsg_1_tt_6_nm_1_q_angrej',
+    'https://www.imdb.com/title/tt4038978/?ref_=nv_sr_srsg_0_tt_4_nm_4_q_mr%2520and%2520misses%2520420'
+]
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+}
+
+# Creation of empty lists to store data
+titles = []
+ratings = []
+
+# Iterations of URLs of my 5 favorite movies
+for url in movie_urls:
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Titles of the movies are extracting here
+    title = soup.find("h1").text.strip()
+    titles.append(title)
+
+    #Rating of the movies are extracting here
+    rating = soup.find('span', class_='sc-bde20123-1').text.strip()
+    ratings.append(rating)
+
+    # Sleep for 5 seconds
+    time.sleep(5)
+
+# DataFrame to organize the data
+movie_data = pd.DataFrame({'Title': titles, 'Rating': ratings})
+# print(movie_data)
+
+# Export data to an Excel file using the openpyxl engine
+movie_data.to_excel('movie_ratings.xlsx', index=False, engine='openpyxl')
+
+print("Data written to movie_ratings.xlsx")
