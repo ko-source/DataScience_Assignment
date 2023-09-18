@@ -1,0 +1,86 @@
+# 17 September 2023
+# CSC461 – Assignment1 – Web Scraping
+# Komal Khizar
+# FA20-BSE-096
+# Q1. [CLO-2]
+# In this task i have created 2 functions first is for scrap data from 1st link 2nsd is for 2nd link and then call that functions
+#and get the data of  functions and then print that data in a text file in a proper formate.  
+import requests
+from bs4 import BeautifulSoup
+names=[]
+descriptions=[]
+events=[]
+# Function to fetch data from the 'timeanddate' website for June 13th
+def scrape_timeanddate():
+    try:
+        # Construct the URL with the given birthdate
+        url = f"https://www.timeanddate.com/on-this-day/june/13"
+
+        # Send an HTTP GET request to the URL
+        response = requests.get(url)
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the HTML content of the page
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Find the element containing the information
+            birthdays=soup.find_all("ul",class_="list--big")
+            birthdays=birthdays[1]
+            names_raw=birthdays.find_all('h3')
+            descriptions_raw=birthdays.find_all('p')
+            for name in names_raw:
+              names.append(name.text.strip())
+            for description in descriptions_raw:
+              descriptions.append(description.text.strip())
+            
+
+
+        else:
+            return "Failed to retrieve data from timeanddate.com."
+
+    except Exception as e:
+        return str(e)
+
+
+# Function to fetch data from the 'britannica' website for June 13th
+def scrape_britannica():
+    try:
+        # Construct the URL with the given birthdate
+        url = f"https://www.britannica.com/on-this-day/June-13"
+
+        # Send an HTTP GET request to the URL
+        response = requests.get(url)
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Parse the HTML content of the page
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Find the elements containing the events
+            event_elements = soup.find_all('div', class_='md-history-event')
+            for event in event_elements:
+              events.append(event.find('div',class_='card-body').text.strip())
+           
+
+       
+
+        else:
+            return ["Failed to retrieve data from britannica.com."]
+
+    except Exception as e:
+        return [str(e)]
+
+scrape_timeanddate()
+scrape_britannica()
+print(len(events))
+# Example usage
+file_name = "output.txt"
+with open(file_name, "w") as file:
+    # Iterate through the list and write each item to the file
+    for i in range(len(names)):
+        if(i==0):
+         file.write('matching birthdays\n\n\n\n')
+        file.write(names[i] +" "+descriptions[i]+ "\n")
+    for i in range(len(events)):
+        if(i==0):
+          file.write('\n\n\nMatching Events\n\n\n\n')
+        file.write("* " + events[i] + "\n\n")
